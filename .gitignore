@@ -1,0 +1,24 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+/practice/.vscode
+/practice/node_modules
+/practice/.pnp
+/practice.pnp.js
+
+# testing
+/practice/coverage
+
+# production
+/practice/build
+
+# misc
+/practice/.DS_Store
+/practice/.env.local
+/practice/.env.development.local
+/practice/.env.test.local
+/practice/.env.production.local
+
+/practice/npm-debug.log*
+/practice/yarn-debug.log*
+/practice/yarn-error.log*
