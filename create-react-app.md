@@ -14,7 +14,7 @@ npm install react-scripts@latest
 
 ##### 暴露配置文件
 
-项目根目录下执行`npm run eject`命令。通常是会报错的，下面是如何处理报错
+项目根目录下执行`npm run eject`命令。通常是会**报错**的，下面是如何处理报错
 
 ```
 git init 
