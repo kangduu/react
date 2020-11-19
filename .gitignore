@@ -22,3 +22,7 @@
 /practice/npm-debug.log*
 /practice/yarn-debug.log*
 /practice/yarn-error.log*
+
+
+# pwd
+/.git-credentials
