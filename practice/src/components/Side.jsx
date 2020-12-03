@@ -1,8 +1,15 @@
-import React, { Component } from "react";
+import React, { Component, PureComponent } from "react";
 
-class Side extends Component {
+class Side extends PureComponent {
+    // constructor() {
+    // super()
+    // }
     render() {
-        return <div>Side</div>
+        console.log(this);
+        return (
+            <div>Side</div>
+        )
+
     }
 }
 

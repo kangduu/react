@@ -26,3 +26,6 @@
 
 # pwd
 /.git-credentials
+
+# source code
+/react-master

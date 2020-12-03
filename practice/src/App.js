@@ -2,9 +2,9 @@
  * @Author: dukang 
  * @Date: 2020-11-12 22:41:04 
  * @Last Modified by: dukang
- * @Last Modified time: 2020-11-18 21:04:27
+ * @Last Modified time: 2020-11-29 23:29:32
  */
-import React from 'react';
+import React, { version } from 'react';
 import './App.css';
 // import test from './test.module.scss';
 
@@ -15,7 +15,7 @@ import {
 import Home from "./components/Home.js";
 import Side from "./components/Side";
 
-// console.log(test);
+console.log(version);
 
 function App() {
   const routes = [
@@ -46,8 +46,13 @@ function App() {
         {
           routes.map(r => {
             // console.log(r.main);
-            return <Route path={r.path} children={<r.main />} />
+            return <Route
+              path={r.path}
+              children={<r.main />}
+              key={r.path}
+            />
           })
+
         }
       </Switch>
     </HashRouter>
