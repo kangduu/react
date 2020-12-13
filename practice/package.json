@@ -66,6 +66,7 @@
     "workbox-webpack-plugin": "4.3.1"
   },
   "scripts": {
+    "server": " webpack-dev-server",
     "start": "node scripts/start.js",
     "build": "node scripts/build.js",
     "test": "node scripts/test.js"
@@ -142,6 +143,9 @@
   },
   "devDependencies": {
     "less": "^3.12.2",
-    "less-loader": "^7.1.0"
+    "less-loader": "^7.1.0",
+    "serve": "^11.3.2",
+    "webpack-cli": "^4.2.0",
+    "webpack-dev-server": "^3.11.0"
   }
 }

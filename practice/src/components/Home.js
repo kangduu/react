@@ -1,11 +1,16 @@
 import React from "react";
 import { Button } from "antd";
+import HomeChildren from "./HomeChildren";
 
 function Home() {
     return (
-        <Button type="primary">
-            home
-        </Button>
+        <div>
+            <Button type="primary">
+                btn
+            </Button>
+            <HomeChildren text={null} />
+        </div>
+
     )
 }
 export default Home

@@ -2,15 +2,14 @@
  * @Author: dukang 
  * @Date: 2020-11-12 22:41:04 
  * @Last Modified by: dukang
- * @Last Modified time: 2020-11-29 23:29:32
+ * @Last Modified time: 2020-12-13 21:47:40
  */
 import React, { version } from 'react';
 import './App.css';
 // import test from './test.module.scss';
 
 import {
-  HashRouter, Switch, Route
-  // , Link, NavLink
+  HashRouter, Switch, Route, NavLink
 } from "react-router-dom";
 import Home from "./components/Home.js";
 import Side from "./components/Side";
@@ -30,16 +29,15 @@ function App() {
       main: () => <h2>Shoelaces</h2>
     }
   ];
+
   return (
-    // <div className="App-header">
-    //   <img src={logo} className="App-logo" alt="logo" />
-    //   <NavLink activeClassName="selected" to="/main">Home</NavLink>
-    //   <NavLink activeClassName="selected" to="/home">Learning React</NavLink>
-    //   <NavLink activeClassName="selected" to="/side">Side Bar</NavLink>
-    //   <NavLink activeClassName="selected" to="/bubblegum">bubblegum</NavLink>
-    //   <NavLink activeClassName="selected" to="/shoelaces">shoelaces</NavLink>
-    // </div>
     <HashRouter className="App" basename='/'>
+      <div className="App-header">
+        <NavLink activeClassName="selected" to="/home">Home</NavLink>
+        <NavLink activeClassName="selected" to="/side">Side Bar</NavLink>
+        <NavLink activeClassName="selected" to="/bubblegum">bubblegum</NavLink>
+        <NavLink activeClassName="selected" to="/shoelaces">shoelaces</NavLink>
+      </div>
       <Switch>
         <Route exact path="/home" component={Home} />
         <Route path="/side" component={Side} />
