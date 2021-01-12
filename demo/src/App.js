@@ -2,7 +2,7 @@
  * @Author: dukang 
  * @Date: 2020-11-12 22:41:04 
  * @Last Modified by: dukang
- * @Last Modified time: 2020-12-13 21:47:40
+ * @Last Modified time: 2021-01-09 16:20:34
  */
 import React, { version } from 'react';
 import './App.css';
@@ -15,7 +15,6 @@ import Home from "./components/Home.js";
 import Side from "./components/Side";
 
 console.log(version);
-
 function App() {
   const routes = [
     {

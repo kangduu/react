@@ -10,7 +10,7 @@ function Home() {
             </Button>
             <HomeChildren text={null} />
         </div>
-
     )
+
 }
 export default Home
