@@ -19,13 +19,16 @@
 
 3. 解决办法
 
-   字典数据统一存储在`store`中，使用`mapStateToProps`解析挂载到组件的props属性上使用。
+   - 字典数据统一存储在`store`中，使用`mapStateToProps`解析挂载到组件的props属性上使用。
+   - 使用[React.lazy()和Suspense](https://zh-hans.reactjs.org/docs/code-splitting.html#reactlazy)实现组件的异步加载，参考[代码分割](https://zh-hans.reactjs.org/docs/code-splitting.html)
 
 4. 问题总结
 
-   React为什么会在打开页面时就会解析所有的`import `? 内部原理是什么？
+   - React为什么会在打开页面时就会解析所有的`import `?  
+   
+     答：React默认加载并解析所有组件。
 
-### 子组件中需要保存用户操作，父组件则不应该使用setState更新数据
+### 子组件中需要保存用户操作或内部状态时，父组件不可以使用setState更新数据。（非可控组件颗粒化）
 
 1. 问题描述
 
