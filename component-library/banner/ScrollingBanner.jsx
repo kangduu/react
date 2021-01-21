@@ -33,7 +33,7 @@ class ScrollingBanner extends Component {
         this.scrollBanner = null
         // 实际数据渲染节点总宽度
         this.renderWidth = 0
-        // requestAnimationFrame instance
+        // requestAnimationFrame实例
         this.animationFrame = null
         // 动画函数
         this.animationField = null
@@ -52,15 +52,32 @@ class ScrollingBanner extends Component {
 
     // 清除动画实列
     clearAnimationInstance() {
+        // 浏览器兼容性处理 (打补丁)
+        const cancelAnimationFrame = window.cancelAnimationFrame ||
+            window.mozCancelAnimationFrame;
         if (this.animationFrame !== null) {
-            window.cancelAnimationFrame(this.animationFrame)
+            if (cancelAnimationFrame instanceof Function) {
+                cancelAnimationFrame(this.animationFrame)
+            }
             this.animationFrame = null
         }
     }
     // 开始动画
     beginAnimation() {
-        if (this.animationFrame !== null) window.cancelAnimationFrame(this.animationFrame)
-        this.animationFrame = window.requestAnimationFrame(this.animationField)
+        // 浏览器兼容性处理 (打补丁)
+        const requestAnimationFrame = window.requestAnimationFrame ||
+            window.mozRequestAnimationFrame ||
+            window.webkitRequestAnimationFrame ||
+            window.msRequestAnimationFrame;
+        const cancelAnimationFrame = window.cancelAnimationFrame ||
+            window.mozCancelAnimationFrame;
+        if (
+            cancelAnimationFrame instanceof Function &&
+            requestAnimationFrame instanceof Function
+        ) {
+            if (this.animationFrame !== null) cancelAnimationFrame(this.animationFrame)
+            this.animationFrame = requestAnimationFrame(this.animationField)
+        }
     }
 
     /**
@@ -221,10 +238,13 @@ class ScrollingBanner extends Component {
             })
         }
         if (itemWidthSum > containerWidth) {
-            this.renderWidth = itemWidthSum
 
+            // 渲染宽度
+            this.renderWidth = itemWidthSum
+            // 设置转换
             this.scrollBanner.style.justifyContent = "space-between"
 
+            // 设置替补数据和开始滚动
             const { _addClassName, dataSource } = this.props
             let nextData = []
             if (_addClassName instanceof Function) {
