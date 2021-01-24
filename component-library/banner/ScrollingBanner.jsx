@@ -83,10 +83,6 @@ class ScrollingBanner extends PureComponent {
             }
             this.animationFrame = null
         }
-        // 重置变换属性值
-        if (this.scrollBanner) {
-            this.scrollBanner.style.transform = `inherit`
-        }
     }
     // 开始动画
     beginAnimation() {
@@ -293,7 +289,13 @@ class ScrollingBanner extends PureComponent {
         const dataChanged = dataSource !== this.props.dataSource
         if (this.state.isScroll === true) {
             // 若props数据源改变了
-            if (dataChanged === true) return this.isNeedAnimation()
+            if (dataChanged === true) {
+                // 重置变换属性值
+                if (this.scrollBanner) {
+                    this.scrollBanner.style.transform = `inherit`
+                }
+                return this.isNeedAnimation()
+            }
             // 数据未发生改变
             return this.customizedAnimation()
         }
