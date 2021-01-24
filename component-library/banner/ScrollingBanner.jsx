@@ -1,29 +1,49 @@
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import { debounce } from "lodash";
 import "./banner.less";
-// 横向无限滚动组件 (广告横幅)
-class ScrollingBanner extends Component {
-    static defaultProps = {
-        dataSource: [
-            { id: "1", name: "横幅滚动列表", value: 10, },
-            { id: "2", name: "横幅滚动列表 横幅滚动列表", value: 20, },
-            { id: "3", name: "横幅滚动列表 横幅滚动列表 横幅滚动列表", value: 30, },
-            { id: "4", name: "横幅滚动列表 横幅滚动列表 横幅滚动列表 横幅滚动列表", value: 40, },
-            { id: "5", name: "横幅滚动列表 横幅滚动列表 横幅滚动列表 横幅滚动列表 横幅滚动列表", value: 50, },
-            { id: "6", name: "横幅滚动列表 横幅滚动列表 横幅滚动列表 横幅滚动列表 横幅滚动列表 横幅滚动列表", value: 60, },
-        ],
-        // 添加 className 的纯函数
-        // 主要原因是：getDerivedStateFromProps 方法无权访问组件实例
-        _addClassName: (data, className) => {
-            if (Array.isArray(data)) {
-                return data.map((item => Object.assign({}, item, { _className: className })))
-            }
-            return data
+
+// 添加 className 的纯函数
+// 主要原因是：getDerivedStateFromProps 方法无权访问组件实例
+const handleAddClassName = (data, className) => {
+    if (Array.isArray(data)) {
+        return data.map((item => Object.assign({}, item, { _className: className })))
+    } return []
+}
+
+/**
+ * @name 获取translateX值
+ * @param {String} value transform 数值
+ * @returns {Number}
+ */
+const handleGetTranslateX = (value) => {
+    if (typeof value !== "string") return 0
+    const splitComma = value.split(",", 1)
+    if (
+        Array.isArray(splitComma) &&
+        typeof splitComma[0] === "string"
+    ) {
+        const splitVlaue = splitComma[0].split("(")
+        if (
+            Array.isArray(splitVlaue) &&
+            typeof splitVlaue[1] === "string"
+        ) {
+            const translateX = splitVlaue[1].replace("px", "")
+            if (isNaN(Number(translateX))) return 0
+            return Math.abs(translateX * 10)
         }
+    }
+    else return 0
+}
+
+// 横向无限滚动组件 (广告横幅)
+class ScrollingBanner extends PureComponent {
+    static defaultProps = {
+        dataSource: [],
     }
     constructor(props) {
         super(props)
         this.state = {
+            isUpdate: false,
             isScroll: false,
             mainData: null,
             nextData: null,
@@ -40,12 +60,13 @@ class ScrollingBanner extends Component {
     }
     // getDerivedStateFromProps 会在调用 render 方法之前调用，并且在 初始挂载及后续更新时 都会被调用。
     // 应返回一个对象来更新 state，如果返回 null 则不更新任何内容。
+    // 此方法无权访问组件实例
     // 派生 state
     static getDerivedStateFromProps(props) {
-        const { _addClassName, dataSource } = props
+        const { dataSource } = props
         let mainData = []
-        if (_addClassName instanceof Function) {
-            mainData = _addClassName(dataSource, "main-item")
+        if (handleAddClassName instanceof Function) {
+            mainData = handleAddClassName(dataSource, "main-item")
         }
         return { mainData }
     }
@@ -55,11 +76,16 @@ class ScrollingBanner extends Component {
         // 浏览器兼容性处理 (打补丁)
         const cancelAnimationFrame = window.cancelAnimationFrame ||
             window.mozCancelAnimationFrame;
+        // 清除动画实例
         if (this.animationFrame !== null) {
             if (cancelAnimationFrame instanceof Function) {
                 cancelAnimationFrame(this.animationFrame)
             }
             this.animationFrame = null
+        }
+        // 重置变换属性值
+        if (this.scrollBanner) {
+            this.scrollBanner.style.transform = `inherit`
         }
     }
     // 开始动画
@@ -79,7 +105,6 @@ class ScrollingBanner extends Component {
             this.animationFrame = requestAnimationFrame(this.animationField)
         }
     }
-
     /**
      * @name 定制动画
      * @param {undefined | Number} startTimestamp 开始时间戳，默认undefined，当鼠标移出时应传入最新值
@@ -97,15 +122,19 @@ class ScrollingBanner extends Component {
                 moveLeft = 0.1 * elapsed,
                 // 使用Math.min控制元素可以刚刚好停止在this.renderWidth位置，既完整的一次整体左移
                 translateX = Math.min(moveLeft, this.renderWidth);
-            // 设置平移,translate3d 开启 CSS CPU 加速
-            this.scrollBanner.style.transform = `translate3d(-${translateX}px,0,0)`
+            if (this.scrollBanner) {
+                // 设置平移,translate3d 开启 CSS CPU 加速
+                this.scrollBanner.style.transform = `translate3d(-${translateX}px,0,0)`
+            }
             // 时间边界点判断
             if (elapsed < totalTime) {
                 this.beginAnimation()
             }
             // 左移清零,并重置动画
             else {
-                this.scrollBanner.style.transform = `translate3d(0,0,0)`
+                if (this.scrollBanner) {
+                    this.scrollBanner.style.transform = 'translate3d(0,0,0)'
+                }
                 startTime = undefined
                 this.beginAnimation()
             }
@@ -113,42 +142,25 @@ class ScrollingBanner extends Component {
         this.beginAnimation()
     }
 
-    /**
-     * @name 获取translateX值
-     * @param {String} value transform 数值
-     * @returns {Number}
-     */
-    _getTranslateXValue(value) {
-        if (typeof value !== "string") return 0
-        const splitComma = value.split(",", 1)
-        if (
-            Array.isArray(splitComma) &&
-            typeof splitComma[0] === "string"
-        ) {
-            const splitVlaue = splitComma[0].split("(")
-            if (
-                Array.isArray(splitVlaue) &&
-                typeof splitVlaue[1] === "string"
-            ) {
-                const translateX = splitVlaue[1].replace("px", "")
-                if (isNaN(Number(translateX))) return 0
-                return Math.abs(translateX * 10)
-            }
-        }
-        else return 0
-    }
-
     // 鼠标移入 暂停
     handleMouseEnter = debounce(() => {
+        if (
+            this.scrollBanner == null ||
+            this.state.isScroll === false
+        ) return
         this.clearAnimationInstance()
     }, 100)
     // 鼠标移出 恢复
     handleMouseLeave = debounce(() => {
+        if (
+            this.scrollBanner == null ||
+            this.state.isScroll === false
+        ) return
         // 获取当前时间戳
         const timestamp = window.performance.now(),
             transform = this.scrollBanner.style.transform,
             // 滚动元素左移值
-            translateX = this._getTranslateXValue(transform),
+            translateX = handleGetTranslateX(transform),
             // 新的时间戳开始值
             newStartTimestamp = timestamp - translateX;
         this.customizedAnimation(newStartTimestamp)
@@ -222,53 +234,72 @@ class ScrollingBanner extends Component {
         )
     }
 
-    // componentDidMount() 会在组件挂载后（插入 DOM 树中）立即调用。
-    // 1.依赖于 DOM 节点的初始化操作
-    // 2.通过网络请求获取数据
-    // 3.直接调用 setState()，这将触发额外渲染，但此渲染会发生在浏览器更新屏幕之前。
-    componentDidMount() {
+    // 判断是否需要动画
+    isNeedAnimation = () => {
+        const { dataSource } = this.props
         const mainItemList = document.getElementsByClassName("main-item")
         const containerWidth = this.scrollContainer.offsetWidth
-        let itemWidthSum = 0
+        let itemWidthSum = 0,
+            isScroll = false,
+            nextData = [],
+            fillData = [];
         if (mainItemList) {
             const nodeArray = Array.from(mainItemList) || []
-            nodeArray.forEach(item => {
+            nodeArray.forEach((item, index) => {
+                // 添加需要替补的元素数据
+                if (itemWidthSum < containerWidth) fillData.push(dataSource[index])
                 const itemWidth = item.offsetWidth
                 itemWidthSum += itemWidth
             })
         }
         if (itemWidthSum > containerWidth) {
-
             // 渲染宽度
             this.renderWidth = itemWidthSum
             // 设置转换
-            this.scrollBanner.style.justifyContent = "space-between"
-
-            // 设置替补数据和开始滚动
-            const { _addClassName, dataSource } = this.props
-            let nextData = []
-            if (_addClassName instanceof Function) {
-                nextData = _addClassName(dataSource, "next-item")
+            if (this.scrollBanner) {
+                this.scrollBanner.style.justifyContent = "space-between"
             }
-            this.setState({
-                isScroll: true,
-                nextData
-            })
+            // 需要滚动
+            isScroll = true
+            // 替补（只添加会显示的部分）
+            if (handleAddClassName instanceof Function) {
+                nextData = handleAddClassName(fillData, "next-item")
+            }
+        } else {
+            if (this.scrollBanner !== null) {
+                this.scrollBanner.style.justifyContent = "center"
+            }
         }
+        this.setState({
+            isUpdate: false,
+            isScroll,
+            nextData
+        })
     }
 
-    // getSnapshotBeforeUpdate() 在最近一次渲染输出（提交到 DOM 节点）之前调用。
-    // 使得组件能在发生更改之前从 DOM 中捕获一些信息（例如，滚动位置）。
-    // 此生命周期的任何返回值将作为参数传递给 componentDidUpdate()。应返回 snapshot 的值（或 null）。
-    getSnapshotBeforeUpdate(prevProps, prevState) {
-        return null
+    // componentDidMount() 会在组件挂载后（插入 DOM 树中）立即调用。
+    // 1.依赖于 DOM 节点的初始化操作
+    // 2.通过网络请求获取数据
+    // 3.直接调用 setState()，这将触发额外渲染，但此渲染会发生在浏览器更新屏幕之前。
+    componentDidMount() {
+        this.isNeedAnimation()
     }
     // componentDidUpdate() 会在更新后会被立即调用。首次渲染不会执行此方法。
     // 当组件更新后，可以在此处对 DOM 进行操作。如果你对更新前后的 props 进行了比较，也可以选择在此处进行网络请求。
     // 可以在 componentDidUpdate() 中直接调用 setState()，但请注意它必须被包裹在一个条件语句里，否则会导致死循环。
     // 这里的 snapshot 是 getSnapshotBeforeUpdate 的返回值。
     componentDidUpdate(prevProps, prevState, snapshot) {
-        if (this.state.isScroll === true) this.customizedAnimation()
+        const { dataSource } = prevProps
+        const dataChanged = dataSource !== this.props.dataSource
+        if (this.state.isScroll === true) {
+            // 若props数据源改变了
+            if (dataChanged === true) return this.isNeedAnimation()
+            // 数据未发生改变
+            return this.customizedAnimation()
+        }
+        if (this.animationFrame !== null) {
+            this.clearAnimationInstance()
+        }
     }
 
     // componentWillUnmount() 会在组件卸载及销毁之前直接调用。
