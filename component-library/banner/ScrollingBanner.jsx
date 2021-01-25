@@ -43,7 +43,6 @@ class ScrollingBanner extends PureComponent {
     constructor(props) {
         super(props)
         this.state = {
-            isUpdate: false,
             isScroll: false,
             mainData: null,
             nextData: null,
@@ -267,7 +266,6 @@ class ScrollingBanner extends PureComponent {
             }
         }
         this.setState({
-            isUpdate: false,
             isScroll,
             nextData
         })
